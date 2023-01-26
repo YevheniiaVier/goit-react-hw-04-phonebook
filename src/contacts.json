@@ -1,0 +1,26 @@
+[
+  {
+    "id": "id-1",
+    "name": "Mira Vierovchuk",
+    "number": "33-44-55",
+    "avatar": "https://cdn-icons-png.flaticon.com/512/1998/1998592.png"
+  },
+  {
+    "id": "id-2",
+    "name": "Solomiia Vierovchuk",
+    "number": "33-44-85",
+    "avatar": "https://cdn-icons-png.flaticon.com/512/616/616438.png"
+  },
+  {
+    "id": "id-3",
+    "name": "Elina Vierovchuk",
+    "number": "33-44-542",
+    "avatar": "https://cdn-icons-png.flaticon.com/512/1623/1623681.png"
+  },
+  {
+    "id": "id-4",
+    "name": "Oksana Shkarupa",
+    "number": "33-44-654",
+    "avatar": "https://cdn-icons-png.flaticon.com/512/1998/1998749.png"
+  }
+]
