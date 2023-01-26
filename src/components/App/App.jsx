@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import shortid from 'shortid';
 import { Container } from './App.styled';
 import { ContactForm } from 'components/ContactForm/ContactForm';
@@ -15,61 +15,54 @@ import { ReactComponent as CloseIcon } from '../../icons/close.svg';
 import initialContacts from '../../contacts.json';
 import defaultUserImg from '../../images/default.png';
 
-export class App extends Component {
-  state = {
-    contacts: initialContacts,
-    filter: '',
-    showModal: false,
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(initialContacts);
+  const [filter, setFilter] = useState('');
+  const [showModal, setShowModal] = useState(false);
 
-  componentDidMount() {
+  useEffect(() => {
     const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
     if (parsedContacts) {
-      this.setState({ contacts: parsedContacts });
+      setContacts(parsedContacts);
     }
-  }
-  componentDidUpdate(_, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const toggleModal = () => {
+    setShowModal(prevState => !prevState);
   };
-  addContact = (name, number, avatar) => {
+
+  const addContact = (name, number, avatar) => {
     const contact = {
       id: shortid.generate(),
       name,
       number,
       avatar: avatar ?? defaultUserImg,
     };
-    this.setState(({ contacts }) => ({
-      contacts: [...contacts, contact],
-    }));
-    this.toggleModal();
+    setContacts(prevState => [...prevState, contact]);
+    toggleModal();
   };
 
-  deleteContact = contactId => {
+  const deleteContact = contactId => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
-      this.setState(prevState => ({
-        contacts: prevState.contacts.filter(
-          contact => contact.id !== contactId
-        ),
-      }));
+      setContacts(prevState => {
+        prevState.filter(prevState => prevState.id !== contactId);
+      });
     }
     return;
   };
-  onClearBtnClick = () => {
-    this.setState({ filter: '' });
+  const onClearBtnClick = () => {
+    setFilter('');
   };
 
-  changeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const changeFilter = e => {
+    setFilter(e.currentTarget.value);
   };
-  getFilteredContacts = () => {
-    const { filter, contacts } = this.state;
+
+  const getFilteredContacts = () => {
     if (filter) {
       const normalizedFilter = filter.toLowerCase();
       return contacts.filter(contact =>
@@ -78,52 +71,46 @@ export class App extends Component {
     }
     return contacts;
   };
-  render() {
-    const { contacts, filter, showModal } = this.state;
-    const filteredContacts = this.getFilteredContacts();
-    return (
-      <Container>
-        <IconButton
-          onClick={this.toggleModal}
-          type="button"
-          aria-label="Add contact"
-        >
-          <AddIcon width="40" height="40" fill="#29668b" />
-        </IconButton>
-        {showModal && (
-          <Modal onClose={this.toggleModal}>
-            <ContactForm actualContacts={contacts} onSubmit={this.addContact} />
-            <IconButton
-              onClick={this.toggleModal}
-              type="button"
-              aria-label="Close modal window"
-            >
-              <CloseIcon width="20" height="20" fill="#29668b" />
-            </IconButton>
-          </Modal>
-        )}
-        <Title text="Phonebook" />
-        <Filter
-          value={filter}
-          onChange={this.changeFilter}
-          onClear={this.onClearBtnClick}
+
+  const filteredContacts = getFilteredContacts();
+  return (
+    <Container>
+      <IconButton onClick={toggleModal} type="button" aria-label="Add contact">
+        <AddIcon width="40" height="40" fill="#29668b" />
+      </IconButton>
+      {showModal && (
+        <Modal onClose={toggleModal}>
+          <ContactForm actualContacts={contacts} onSubmit={addContact} />
+          <IconButton
+            onClick={toggleModal}
+            type="button"
+            aria-label="Close modal window"
+          >
+            <CloseIcon width="20" height="20" fill="#29668b" />
+          </IconButton>
+        </Modal>
+      )}
+      <Title text="Phonebook" />
+      <Filter
+        value={filter}
+        onChange={changeFilter}
+        onClear={onClearBtnClick}
+      />
+      <Title text="Contacts" />
+      {contacts[0] ? (
+        <ContactList
+          contacts={filteredContacts}
+          onDeleteContact={deleteContact}
         />
-        <Title text="Contacts" />
-        {contacts[0] ? (
-          <ContactList
-            contacts={filteredContacts}
-            onDeleteContact={this.deleteContact}
-          />
-        ) : (
-          <Notification
-            text="There is no contact yet, you can add a new one!"
-            imgPath={noContactImg}
-          />
-        )}
-        {!filteredContacts[0] && contacts[0] && (
-          <Notification text="No contact found" imgPath={noContactImg} />
-        )}
-      </Container>
-    );
-  }
-}
+      ) : (
+        <Notification
+          text="There is no contact yet, you can add a new one!"
+          imgPath={noContactImg}
+        />
+      )}
+      {!filteredContacts[0] && contacts[0] && (
+        <Notification text="No contact found" imgPath={noContactImg} />
+      )}
+    </Container>
+  );
+};
