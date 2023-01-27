@@ -16,19 +16,14 @@ import initialContacts from '../../contacts.json';
 import defaultUserImg from '../../images/default.png';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(initialContacts);
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(window.localStorage.getItem('contacts')) ?? initialContacts
+  );
   const [filter, setFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const parsedContacts = JSON.parse(localStorage.getItem('contacts'));
-    if (parsedContacts) {
-      setContacts(parsedContacts);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
   const toggleModal = () => {
@@ -48,12 +43,13 @@ export const App = () => {
 
   const deleteContact = contactId => {
     if (window.confirm('Are you sure you want to delete this contact?')) {
-      setContacts(prevState => {
-        prevState.filter(prevState => prevState.id !== contactId);
-      });
+      setContacts(prevState =>
+        prevState.filter(prevState => prevState.id !== contactId)
+      );
     }
     return;
   };
+
   const onClearBtnClick = () => {
     setFilter('');
   };

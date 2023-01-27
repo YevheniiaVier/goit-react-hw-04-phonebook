@@ -19,14 +19,8 @@ export const Modal = ({ children, onClose }) => {
     }
   };
 
-  const handleBackdropClick = e => {
-    if (e.currentTarget === e.target) {
-      onClose();
-    }
-  };
-
   return createPortal(
-    <Backdrop onClick={handleBackdropClick}>
+    <Backdrop>
       <ModalContent>{children}</ModalContent>
     </Backdrop>,
     modalRoot
